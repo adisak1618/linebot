@@ -10,6 +10,22 @@ var users = require('./routes/users');
 
 var app = express();
 
+var lex = require('letsencrypt-express').create({
+  // set to https://acme-v01.api.letsencrypt.org/directory in production
+  server: 'staging'
+
+// If you wish to replace the default plugins, you may do so here
+//
+, challenges: { 'http-01': require('le-challenge-fs').create({ webrootPath: '/tmp/acme-challenges' }) }
+, store: require('le-store-certbot').create({ webrootPath: '/tmp/acme-challenges' })
+
+// You probably wouldn't need to replace the default sni handler
+// See https://github.com/Daplie/le-sni-auto if you think you do
+//, sni: require('le-sni-auto').create({})
+
+, approveDomains: approveDomains
+});
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -56,5 +72,11 @@ app.use(function(err, req, res, next) {
   });
 });
 
+var privateKey = fs.readFileSync( 'key.pem' );
+var certificate = fs.readFileSync( 'csr.pem' );
 
+https.createServer({
+    key: privateKey,
+    cert: certificate
+}, app).listen(4000);
 module.exports = app;
