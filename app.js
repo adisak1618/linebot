@@ -58,8 +58,8 @@ app.use(function(err, req, res, next) {
   });
 });
 
-var privateKey = fs.readFileSync( 'key.pem' );
-var certificate = fs.readFileSync( 'csr.pem' );
+var privateKey = fs.readFileSync( './key.pem' );
+var certificate = fs.readFileSync( './server.crt' );
 
 https.createServer({
     key: privateKey,
